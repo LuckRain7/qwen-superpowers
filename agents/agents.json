@@ -1,0 +1,87 @@
+{
+  "agents": [
+    {
+      "name": "default",
+      "description": "Default development agent with full superpowers",
+      "systemPrompt": "./QWEN.md",
+      "skills": [
+        "brainstorming",
+        "using-git-worktrees",
+        "writing-plans",
+        "subagent-driven-development",
+        "test-driven-development",
+        "requesting-code-review",
+        "finishing-a-development-branch",
+        "systematic-debugging",
+        "verification-before-completion"
+      ],
+      "capabilities": [
+        "code_generation",
+        "test_writing",
+        "debugging",
+        "code_review",
+        "planning",
+        "git_operations"
+      ],
+      "constraints": {
+        "requireTests": true,
+        "requirePlanning": true,
+        "requireReview": true,
+        "enforceTDD": true
+      }
+    },
+    {
+      "name": "subagent",
+      "description": "Isolated task execution agent with TDD focus",
+      "systemPrompt": "./agents/SUBAGENT.md",
+      "skills": [
+        "test-driven-development",
+        "verification-before-completion"
+      ],
+      "capabilities": [
+        "code_generation",
+        "test_writing"
+      ],
+      "constraints": {
+        "requireTests": true,
+        "enforceTDD": true,
+        "isolatedContext": true
+      }
+    },
+    {
+      "name": "reviewer",
+      "description": "Code review agent for quality checks",
+      "systemPrompt": "./agents/REVIEWER.md",
+      "skills": [
+        "requesting-code-review"
+      ],
+      "capabilities": [
+        "code_review",
+        "static_analysis",
+        "security_audit"
+      ],
+      "constraints": {
+        "readOnly": true,
+        "blockOnCritical": true
+      }
+    },
+    {
+      "name": "debugger",
+      "description": "Specialized debugging agent",
+      "systemPrompt": "./agents/DEBUGGER.md",
+      "skills": [
+        "systematic-debugging",
+        "verification-before-completion"
+      ],
+      "capabilities": [
+        "debugging",
+        "test_writing",
+        "root_cause_analysis"
+      ],
+      "constraints": {
+        "requireEvidence": true,
+        "requireReproduction": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "commands": [
+    {
+      "name": "superpowers",
+      "description": "Main command to access all superpowers skills",
+      "usage": "/superpowers [skill-name]",
+      "skills": {
+        "brainstorming": "Start requirements clarification",
+        "writing-plans": "Create detailed implementation plan",
+        "systematic-debugging": "Begin structured debugging",
+        "code-review": "Request automated code review",
+        "status": "Show current workflow status",
+        "help": "Show available skills"
+      }
+    },
+    {
+      "name": "plan",
+      "description": "Quick plan generation",
+      "usage": "/plan [description]"
+    },
+    {
+      "name": "review",
+      "description": "Request code review",
+      "usage": "/review"
+    },
+    {
+      "name": "debug",
+      "description": "Start systematic debugging",
+      "usage": "/debug [issue description]"
+    },
+    {
+      "name": "test",
+      "description": "Run tests with TDD enforcement",
+      "usage": "/test [test description]"
+    }
+  ]
+}

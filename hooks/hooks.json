@@ -1,0 +1,71 @@
+{
+  "hooks": [
+    {
+      "name": "on-task-start",
+      "description": "Triggered when a new task is requested",
+      "event": "taskStart",
+      "skills": [
+        "brainstorming",
+        "using-git-worktrees"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "on-plan-request",
+      "description": "Triggered when planning is needed",
+      "event": "planRequested",
+      "skills": [
+        "writing-plans"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "on-implementation",
+      "description": "Triggered when implementation begins",
+      "event": "implementationStart",
+      "skills": [
+        "subagent-driven-development",
+        "test-driven-development"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "on-completion",
+      "description": "Triggered when implementation completes",
+      "event": "implementationComplete",
+      "skills": [
+        "requesting-code-review",
+        "finishing-a-development-branch"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "on-debug",
+      "description": "Triggered when debugging is needed",
+      "event": "debugStart",
+      "skills": [
+        "systematic-debugging",
+        "verification-before-completion"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "pre-commit",
+      "description": "Triggered before any commit",
+      "event": "preCommit",
+      "skills": [
+        "verification-before-completion"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "on-test-failure",
+      "description": "Triggered when tests fail",
+      "event": "testFailure",
+      "skills": [
+        "systematic-debugging"
+      ],
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "qwen-superpowers",
+  "version": "1.0.0",
+  "description": "Comprehensive skill system for Qwen Code enforcing professional engineering practices",
+  "author": "Qwen Superpowers Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/qwen-superpowers"
+  },
+  "qwen": {
+    "minVersion": "1.0.0",
+    "entryPoint": "./QWEN.md",
+    "skills": "./skills",
+    "hooks": "./hooks",
+    "commands": "./commands",
+    "agents": "./agents"
+  },
+  "skills": [
+    "brainstorming",
+    "using-git-worktrees",
+    "writing-plans",
+    "subagent-driven-development",
+    "test-driven-development",
+    "requesting-code-review",
+    "finishing-a-development-branch",
+    "systematic-debugging",
+    "verification-before-completion",
+    "dispatching-parallel-agents",
+    "receiving-code-review",
+    "writing-skills",
+    "using-superpowers"
+  ],
+  "triggers": {
+    "onTaskStart": ["brainstorming", "using-git-worktrees"],
+    "onPlanRequest": ["writing-plans"],
+    "onImplementation": ["subagent-driven-development", "test-driven-development"],
+    "onCompletion": ["requesting-code-review", "finishing-a-development-branch"],
+    "onDebug": ["systematic-debugging", "verification-before-completion"]
+  }
+}
