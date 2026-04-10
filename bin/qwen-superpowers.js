@@ -12,6 +12,9 @@ const { version: VERSION } = JSON.parse(
 );
 const PACKAGE_NAME = 'Qwen Superpowers';
 
+// Configuration
+const COPY_QWEN_MD = false; // Set to false to skip QWEN.md copying
+
 // Colors for terminal output
 const COLORS = {
   reset: '\x1b[0m',
@@ -158,9 +161,12 @@ function createSkill(skillName) {
 function copyDirectory(src, dest) {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true });
+    console.log(colorize(`  📁 Created directory: ${dest}`, 'dim'));
   }
 
   const entries = fs.readdirSync(src, { withFileTypes: true });
+  let copiedCount = 0;
+  let skippedCount = 0;
 
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
@@ -169,8 +175,20 @@ function copyDirectory(src, dest) {
     if (entry.isDirectory()) {
       copyDirectory(srcPath, destPath);
     } else {
-      fs.copyFileSync(srcPath, destPath);
+      // Only copy files that don't already exist in destination
+      if (!fs.existsSync(destPath)) {
+        fs.copyFileSync(srcPath, destPath);
+        copiedCount++;
+        console.log(colorize(`    📄 Copied file: ${entry.name}`, 'dim'));
+      } else {
+        skippedCount++;
+        console.log(colorize(`    ⏭️  Skipped existing: ${entry.name}`, 'dim'));
+      }
     }
+  }
+
+  if (copiedCount > 0 || skippedCount > 0) {
+    console.log(colorize(`    ✓ Subtotal: ${copiedCount} new files, ${skippedCount} skipped`, 'cyan'));
   }
 }
 
@@ -180,61 +198,23 @@ async function installToLocal(targetDir, skipPrompt = false) {
 
   console.log(colorize('\nInstallation mode:', 'blue') + colorize(' Local (Project)', 'green'));
   console.log(colorize('Target directory:', 'blue') + colorize(` ${qwenDir}`, 'cyan'));
+  console.log(colorize('Package root:', 'blue') + colorize(` ${packageRoot}`, 'cyan'));
   console.log();
 
   // Create .qwen directory if it doesn't exist
+  console.log(colorize('Step 1/5:', 'bold') + ' Create .qwen directory');
   if (!fs.existsSync(qwenDir)) {
     fs.mkdirSync(qwenDir, { recursive: true });
-    console.log(colorize('✓', 'green') + ' Created .qwen/ directory');
+    console.log(colorize('  ✓ Created: .qwen/ directory', 'green'));
   } else {
-    console.log(colorize('✓', 'yellow') + ' .qwen/ directory already exists');
+    console.log(colorize('  ✓ Already exists: .qwen/ directory', 'yellow'));
   }
 
   // Check if QWEN.md already exists in .qwen
-  if (fs.existsSync(path.join(qwenDir, 'QWEN.md'))) {
-    console.log(colorize('Warning:', 'yellow') + ' QWEN.md already exists in .qwen/ directory.');
-    if (!skipPrompt) {
-      const readline = require('readline');
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-
-      return new Promise((resolve) => {
-        rl.question(colorize('Do you want to overwrite it? (y/N) ', 'yellow'), (answer) => {
-          rl.close();
-          if (!answer.toLowerCase().startsWith('y')) {
-            console.log(colorize('Skipping QWEN.md', 'yellow'));
-            resolve(false);
-          } else {
-            fs.copyFileSync(path.join(packageRoot, 'QWEN.md'), path.join(qwenDir, 'QWEN.md'));
-            console.log(colorize('✓', 'green') + ' Copied QWEN.md');
-            resolve(true);
-          }
-        });
-      });
-    } else {
-      console.log(colorize('Skipping QWEN.md (non-interactive mode)', 'yellow'));
-    }
-  } else {
-    fs.copyFileSync(path.join(packageRoot, 'QWEN.md'), path.join(qwenDir, 'QWEN.md'));
-    console.log(colorize('✓', 'green') + ' Copied QWEN.md');
-  }
-
-  // Copy skills, hooks, commands, agents directories to .qwen
-  const dirsToCopy = ['skills', 'hooks', 'commands', 'agents'];
-  
-  for (const dir of dirsToCopy) {
-    const srcDir = path.join(packageRoot, dir);
-    const destDir = path.join(qwenDir, dir);
-
-    if (!fs.existsSync(srcDir)) {
-      console.log(colorize('✓', 'yellow') + ` Skipped ${dir}/ (not found in package)`);
-      continue;
-    }
-
-    if (fs.existsSync(destDir)) {
-      console.log(colorize('Warning:', 'yellow') + ` ${dir}/ directory already exists in .qwen/`);
+  if (COPY_QWEN_MD) {
+    console.log(colorize('\nStep 2/5:', 'bold') + ' Process QWEN.md');
+    if (fs.existsSync(path.join(qwenDir, 'QWEN.md'))) {
+      console.log(colorize('  ⚠️  Warning: QWEN.md already exists in .qwen/ directory', 'yellow'));
       if (!skipPrompt) {
         const readline = require('readline');
         const rl = readline.createInterface({
@@ -242,51 +222,85 @@ async function installToLocal(targetDir, skipPrompt = false) {
           output: process.stdout
         });
 
-        await new Promise((resolve) => {
-          rl.question(colorize(`Overwrite ${dir}/ directory? (y/N) `, 'yellow'), (answer) => {
+        return new Promise((resolve) => {
+          rl.question(colorize('  Overwrite? (y/N) ', 'yellow'), (answer) => {
             rl.close();
-            if (answer.toLowerCase().startsWith('y')) {
-              fs.rmSync(destDir, { recursive: true, force: true });
-              copyDirectory(srcDir, destDir);
-              console.log(colorize('✓', 'green') + ` Copied ${dir}/`);
+            if (!answer.toLowerCase().startsWith('y')) {
+              console.log(colorize('  ⏭️  Skipped QWEN.md', 'yellow'));
+              resolve(false);
             } else {
-              console.log(colorize(`Skipping ${dir}/ directory`, 'yellow'));
+              fs.copyFileSync(path.join(packageRoot, 'QWEN.md'), path.join(qwenDir, 'QWEN.md'));
+              console.log(colorize('  ✓ Copied: QWEN.md', 'green'));
+              resolve(true);
             }
-            resolve();
           });
         });
       } else {
-        console.log(colorize(`Skipping ${dir}/ directory (non-interactive mode)`, 'yellow'));
+        console.log(colorize('  ⏭️  Skipped QWEN.md (non-interactive mode)', 'yellow'));
       }
     } else {
+      fs.copyFileSync(path.join(packageRoot, 'QWEN.md'), path.join(qwenDir, 'QWEN.md'));
+      console.log(colorize('  ✓ Copied: QWEN.md', 'green'));
+    }
+  } else {
+    console.log(colorize('\nStep 2/5:', 'bold') + ' Process QWEN.md');
+    console.log(colorize('  ⏭️  Skipped QWEN.md (COPY_QWEN_MD is disabled)', 'yellow'));
+  }
+
+  // Copy skills, hooks, commands, agents directories to .qwen
+  const dirsToCopy = ['skills', 'hooks', 'commands', 'agents'];
+
+  console.log(colorize('\nStep 3/5:', 'bold') + ' Copy skills, hooks, commands, and agents directories');
+  for (const dir of dirsToCopy) {
+    const srcDir = path.join(packageRoot, dir);
+    const destDir = path.join(qwenDir, dir);
+
+    console.log(colorize(`  → Processing ${dir}/:`, 'cyan'));
+
+    if (!fs.existsSync(srcDir)) {
+      console.log(colorize(`    ⏭️  Skipped ${dir}/ (not found in package)`, 'yellow'));
+      continue;
+    }
+
+    if (fs.existsSync(destDir)) {
+      console.log(colorize(`    ℹ️  Info: ${dir}/ directory already exists in .qwen/`, 'cyan'));
+      console.log(colorize(`    → Merging new files into existing directory`, 'dim'));
       copyDirectory(srcDir, destDir);
-      console.log(colorize('✓', 'green') + ` Copied ${dir}/`);
+      console.log(colorize(`  ✓ Merged: ${dir}/ (preserved existing files)`, 'green'));
+    } else {
+      copyDirectory(srcDir, destDir);
+      console.log(colorize(`  ✓ Copied: ${dir}/`, 'green'));
     }
   }
 
   // Copy .qwen-plugin to project root (not .qwen)
+  console.log(colorize('\nStep 4/5:', 'bold') + ' Copy plugin file');
   const pluginDest = path.join(targetDir, '.qwen-plugin');
   if (!fs.existsSync(pluginDest)) {
     fs.copyFileSync(path.join(packageRoot, '.qwen-plugin'), pluginDest);
-    console.log(colorize('✓', 'green') + ' Copied .qwen-plugin');
+    console.log(colorize('  ✓ Copied: .qwen-plugin', 'green'));
   } else {
-    console.log(colorize('✓', 'yellow') + ' Skipped .qwen-plugin (already exists)');
+    console.log(colorize('  ⏭️  Skipped .qwen-plugin (already exists)', 'yellow'));
   }
 
   // Update .gitignore
+  console.log(colorize('\nStep 5/5:', 'bold') + ' Update .gitignore');
   const gitignorePath = path.join(targetDir, '.gitignore');
   let gitignoreContent = '';
 
   if (fs.existsSync(gitignorePath)) {
     gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
+    console.log(colorize('  ℹ️  Read existing .gitignore file', 'dim'));
+  } else {
+    console.log(colorize('  ℹ️  .gitignore not found, will create new file', 'dim'));
   }
 
   if (!gitignoreContent.includes('.qwen/worktrees')) {
     gitignoreContent += '\n\n# Qwen Superpowers\n.qwen/worktrees/\n.qwen/designs/\n.qwen/plans/\n';
     fs.writeFileSync(gitignorePath, gitignoreContent);
-    console.log(colorize('✓', 'green') + ' Updated .gitignore');
+    console.log(colorize('  ✓ Updated: .gitignore (added Qwen ignore rules)', 'green'));
   } else {
-    console.log(colorize('✓', 'yellow') + ' .gitignore already contains Qwen entries');
+    console.log(colorize('  ⏭️  Skipped .gitignore (already contains Qwen rules)', 'yellow'));
   }
 
   return Promise.resolve();
@@ -294,69 +308,31 @@ async function installToLocal(targetDir, skipPrompt = false) {
 
 async function installToGlobal(skipPrompt = false) {
   const packageRoot = path.join(__dirname, '..');
-  
-  // 确定全局 .qwen 目录
+
+  // Determine global .qwen directory
   // macOS/Linux: ~/.qwen
   // Windows: %USERPROFILE%\.qwen
   const qwenDir = path.join(os.homedir(), '.qwen');
 
   console.log(colorize('\nInstallation mode:', 'blue') + colorize(' Global', 'green'));
   console.log(colorize('Target directory:', 'blue') + colorize(` ${qwenDir}`, 'cyan'));
+  console.log(colorize('Package root:', 'blue') + colorize(` ${packageRoot}`, 'cyan'));
   console.log();
 
-  // 创建全局 .qwen 目录（如果不存在）
+  // Create global .qwen directory if it doesn't exist
+  console.log(colorize('Step 1/4:', 'bold') + ' Create global .qwen directory');
   if (!fs.existsSync(qwenDir)) {
     fs.mkdirSync(qwenDir, { recursive: true });
-    console.log(colorize('✓', 'green') + ' Created .qwen/ directory');
+    console.log(colorize('  ✓ Created: .qwen/ directory', 'green'));
   } else {
-    console.log(colorize('✓', 'yellow') + ' .qwen/ directory already exists');
+    console.log(colorize('  ✓ Already exists: .qwen/ directory', 'yellow'));
   }
 
-  // 检查 QWEN.md 是否已存在
-  if (fs.existsSync(path.join(qwenDir, 'QWEN.md'))) {
-    console.log(colorize('Warning:', 'yellow') + ' QWEN.md already exists in .qwen/ directory.');
-    if (!skipPrompt) {
-      const readline = require('readline');
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-
-      return new Promise((resolve) => {
-        rl.question(colorize('Do you want to overwrite it? (y/N) ', 'yellow'), (answer) => {
-          rl.close();
-          if (!answer.toLowerCase().startsWith('y')) {
-            console.log(colorize('Skipping QWEN.md', 'yellow'));
-            resolve(false);
-          } else {
-            fs.copyFileSync(path.join(packageRoot, 'QWEN.md'), path.join(qwenDir, 'QWEN.md'));
-            console.log(colorize('✓', 'green') + ' Copied QWEN.md');
-            resolve(true);
-          }
-        });
-      });
-    } else {
-      console.log(colorize('Skipping QWEN.md (non-interactive mode)', 'yellow'));
-    }
-  } else {
-    fs.copyFileSync(path.join(packageRoot, 'QWEN.md'), path.join(qwenDir, 'QWEN.md'));
-    console.log(colorize('✓', 'green') + ' Copied QWEN.md');
-  }
-
-  // 复制 skills, hooks, commands, agents 目录到 .qwen
-  const dirsToCopy = ['skills', 'hooks', 'commands', 'agents'];
-  
-  for (const dir of dirsToCopy) {
-    const srcDir = path.join(packageRoot, dir);
-    const destDir = path.join(qwenDir, dir);
-
-    if (!fs.existsSync(srcDir)) {
-      console.log(colorize('✓', 'yellow') + ` Skipped ${dir}/ (not found in package)`);
-      continue;
-    }
-
-    if (fs.existsSync(destDir)) {
-      console.log(colorize('Warning:', 'yellow') + ` ${dir}/ directory already exists in .qwen/`);
+  // Check if QWEN.md already exists
+  if (COPY_QWEN_MD) {
+    console.log(colorize('\nStep 2/4:', 'bold') + ' Process QWEN.md');
+    if (fs.existsSync(path.join(qwenDir, 'QWEN.md'))) {
+      console.log(colorize('  ⚠️  Warning: QWEN.md already exists in .qwen/ directory', 'yellow'));
       if (!skipPrompt) {
         const readline = require('readline');
         const rl = readline.createInterface({
@@ -364,40 +340,70 @@ async function installToGlobal(skipPrompt = false) {
           output: process.stdout
         });
 
-        await new Promise((resolve) => {
-          rl.question(colorize(`Overwrite ${dir}/ directory? (y/N) `, 'yellow'), (answer) => {
+        return new Promise((resolve) => {
+          rl.question(colorize('  Overwrite? (y/N) ', 'yellow'), (answer) => {
             rl.close();
-            if (answer.toLowerCase().startsWith('y')) {
-              fs.rmSync(destDir, { recursive: true, force: true });
-              copyDirectory(srcDir, destDir);
-              console.log(colorize('✓', 'green') + ` Copied ${dir}/`);
+            if (!answer.toLowerCase().startsWith('y')) {
+              console.log(colorize('  ⏭️  Skipped QWEN.md', 'yellow'));
+              resolve(false);
             } else {
-              console.log(colorize(`Skipping ${dir}/ directory`, 'yellow'));
+              fs.copyFileSync(path.join(packageRoot, 'QWEN.md'), path.join(qwenDir, 'QWEN.md'));
+              console.log(colorize('  ✓ Copied: QWEN.md', 'green'));
+              resolve(true);
             }
-            resolve();
           });
         });
       } else {
-        console.log(colorize(`Skipping ${dir}/ directory (non-interactive mode)`, 'yellow'));
+        console.log(colorize('  ⏭️  Skipped QWEN.md (non-interactive mode)', 'yellow'));
       }
     } else {
+      fs.copyFileSync(path.join(packageRoot, 'QWEN.md'), path.join(qwenDir, 'QWEN.md'));
+      console.log(colorize('  ✓ Copied: QWEN.md', 'green'));
+    }
+  } else {
+    console.log(colorize('\nStep 2/4:', 'bold') + ' Process QWEN.md');
+    console.log(colorize('  ⏭️  Skipped QWEN.md (COPY_QWEN_MD is disabled)', 'yellow'));
+  }
+
+  // Copy skills, hooks, commands, agents directories to .qwen
+  const dirsToCopy = ['skills', 'hooks', 'commands', 'agents'];
+
+  console.log(colorize('\nStep 3/4:', 'bold') + ' Copy skills, hooks, commands, and agents directories');
+  for (const dir of dirsToCopy) {
+    const srcDir = path.join(packageRoot, dir);
+    const destDir = path.join(qwenDir, dir);
+
+    console.log(colorize(`  → Processing ${dir}/:`, 'cyan'));
+
+    if (!fs.existsSync(srcDir)) {
+      console.log(colorize(`    ⏭️  Skipped ${dir}/ (not found in package)`, 'yellow'));
+      continue;
+    }
+
+    if (fs.existsSync(destDir)) {
+      console.log(colorize(`    ℹ️  Info: ${dir}/ directory already exists in .qwen/`, 'cyan'));
+      console.log(colorize(`    → Merging new files into existing directory`, 'dim'));
       copyDirectory(srcDir, destDir);
-      console.log(colorize('✓', 'green') + ` Copied ${dir}/`);
+      console.log(colorize(`  ✓ Merged: ${dir}/ (preserved existing files)`, 'green'));
+    } else {
+      copyDirectory(srcDir, destDir);
+      console.log(colorize(`  ✓ Copied: ${dir}/`, 'green'));
     }
   }
 
-  // 复制 .qwen-plugin 到 .qwen 目录
+  // Copy .qwen-plugin to .qwen directory
+  console.log(colorize('\nStep 4/4:', 'bold') + ' Copy plugin file');
   const pluginDest = path.join(qwenDir, '.qwen-plugin');
   if (!fs.existsSync(pluginDest)) {
     fs.copyFileSync(path.join(packageRoot, '.qwen-plugin'), pluginDest);
-    console.log(colorize('✓', 'green') + ' Copied .qwen-plugin');
+    console.log(colorize('  ✓ Copied: .qwen-plugin', 'green'));
   } else {
-    console.log(colorize('✓', 'yellow') + ' Skipped .qwen-plugin (already exists)');
+    console.log(colorize('  ⏭️  Skipped .qwen-plugin (already exists)', 'yellow'));
   }
 
   console.log(colorize('\nNext steps:', 'bold'));
   console.log('');
-  console.log('1. Review the installed files:');
+  console.log('1. Review installed files:');
   console.log(`   ${colorize(`ls -la ${qwenDir}`, 'yellow')}`);
   console.log('');
   console.log('2. Add to your QWEN.md in each project:');
@@ -439,7 +445,7 @@ function interactiveInstall() {
         console.log();
         console.log(colorize('Next steps:', 'bold'));
         console.log('');
-        console.log('1. Review the installed files:');
+        console.log('1. Review installed files:');
         console.log(`   ${colorize('ls -la', 'yellow')}`);
         console.log('');
         console.log('2. Start using superpowers in your Qwen Code sessions');
@@ -477,6 +483,9 @@ function postInstall() {
 async function main() {
   const args = process.argv.slice(2);
 
+  console.log(colorize(`\n🚀 Qwen Superpowers Installer v${VERSION}`, 'cyan'));
+  console.log(colorize('═══════════════════════════════════════════════════', 'dim'));
+
   // Handle --help, -h, --version, -v anywhere
   if (args.includes('--help') || args.includes('-h')) {
     printHeader();
@@ -496,11 +505,14 @@ async function main() {
   const isLocal = options.includes('--local');
   const skipPrompt = options.includes('--yes') || options.includes('-y');
 
-  printHeader();
+  console.log(colorize(`Command: ${command}`, 'dim'));
+  console.log(colorize(`Options: ${options.join(', ') || 'none'}`, 'dim'));
+  console.log();
 
   switch (command) {
     case 'install':
     case 'i':
+      console.log(colorize('Starting installation...', 'cyan'));
       if (isGlobal) {
         await installToGlobal(skipPrompt);
       } else {
@@ -508,8 +520,10 @@ async function main() {
 
         if (!isGlobal && !isLocal && !skipPrompt) {
           // Interactive mode
+          console.log(colorize('Entering interactive mode...', 'dim'));
           await interactiveInstall();
         } else {
+          console.log(colorize(`Target directory: ${targetDir}`, 'cyan'));
           await installToLocal(targetDir, skipPrompt);
 
           console.log(colorize('\n╔══════════════════════════════════════════════════╗', 'green'));
@@ -522,12 +536,14 @@ async function main() {
 
     case 'list':
     case 'ls':
+      console.log(colorize('📋 Fetching available skills...', 'cyan'));
       listSkills();
       break;
 
     case 'create-skill':
     case 'create':
       const skillName = options[0];
+      console.log(colorize(`✨ Creating new skill: ${skillName || '(unnamed)'}`, 'cyan'));
       createSkill(skillName);
       break;
 
@@ -542,7 +558,7 @@ async function main() {
       break;
 
     default:
-      console.error(colorize(`Unknown command: ${command}`, 'red'));
+      console.error(colorize(`\n❌ Unknown command: ${command}`, 'red'));
       console.log(`Run ${colorize(`${PACKAGE_NAME} help`, 'cyan')} for usage information\n`);
       process.exit(1);
   }
@@ -561,7 +577,9 @@ module.exports = {
 // Run main if called directly
 if (require.main === module) {
   main().catch(err => {
-    console.error(colorize('\nError:', 'red'), err.message);
+    console.error(colorize('\n❌ Error occurred:', 'red'), err.message);
+    console.error(colorize('Stack trace:', 'dim'));
+    console.error(colorize(err.stack, 'dim'));
     process.exit(1);
   });
 }

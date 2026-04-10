@@ -30,3 +30,9 @@ npm-debug.log*
 tmp/
 temp/
 *.tmp
+
+
+# Qwen Superpowers
+.qwen/worktrees/
+.qwen/designs/
+.qwen/plans/
