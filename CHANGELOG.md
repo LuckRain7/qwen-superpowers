@@ -5,6 +5,46 @@ All notable changes to Qwen Superpowers will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-10
+
+### Added
+
+#### Installation System
+- `npx` based installation - no global installation required
+- `install` command with `--local` and `--global` flags
+- `--yes` / `-y` flag for non-interactive installation
+- `list` command to show available skills
+- `create-skill` command to create custom skills
+- `help` command for usage information
+
+#### Improved Installation Paths
+- **Local installation**: Files copied to `./.qwen/` directory
+- **Global installation**: Files copied to `~/.qwen/` (macOS/Linux) or `%USERPROFILE%\.qwen/` (Windows)
+- Cross-platform support for Windows users
+- Automatic `.qwen/` directory creation if not exists
+- Smart skip for already installed directories with overwrite prompts
+
+### Changed
+
+- Updated all README files to use `npx` commands instead of global npm installation
+- Simplified installation process - no more setup scripts required
+- Better user experience with clear installation prompts
+- Consistent directory structure for local and global installations
+
+### Deprecated
+
+- `./scripts/setup.sh` - replaced by `npx qwen-superpowers-r install`
+
+### Documentation
+
+- Updated README.md (English)
+- Updated README.zh.md (Chinese)
+- Updated README.ja.md (Japanese)
+- Updated README.ko.md (Korean)
+- Updated README.es.md (Spanish)
+- Updated README.fr.md (French)
+- Updated README.de.md (German)
+
 ## [1.0.0] - 2026-04-09
 
 ### Added

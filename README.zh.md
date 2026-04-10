@@ -24,26 +24,53 @@ Qwen Superpowers 将 Qwen Code 从通用的编码助手转变为遵循经过验�
 
 ## 安装
 
-### 快速安装
+### npx 安装（推荐）
+
+无需安装！使用 `npx` 直接运行命令：
+
+```bash
+# 运行交互式安装器
+npx qwen-superpowers-r install
+
+# 无提示安装到当前项目
+npx qwen-superpowers-r install --local --yes
+
+# 无提示全局安装
+npx qwen-superpowers-r install --global --yes
+
+# 列出可用技能
+npx qwen-superpowers-r list
+
+# 创建新技能
+npx qwen-superpowers-r create-skill my-custom-skill
+
+# 显示帮助
+npx qwen-superpowers-r help
+```
+
+交互式安装器会提示你选择：
+- **当前项目** - 安装到 `./.qwen/` 目录
+- **全局** - 安装到 `~/.qwen/`（跨项目共享）
+
+### Git 安装
 
 ```bash
 # 克隆此仓库
 git clone https://github.com/your-org/qwen-superpowers.git
 cd qwen-superpowers
 
-# 运行安装脚本
-./scripts/setup.sh
+# 使用 npx 运行
+npx qwen-superpowers-r install --local
 ```
 
 ### 手动安装
 
 1. 将 `.qwen-plugin` 文件复制到你项目的根目录
-2. 将 `skills/`、`hooks/`、`commands/` 和 `agents/` 目录复制到你项目中
-3. 将以下内容添加到你的 Qwen Code 设置或 `QWEN.md` 中：
-
-```markdown
-@load ./skills/using-superpowers.md
-```
+2. 运行安装器将技能复制到你项目：
+   ```bash
+   npx qwen-superpowers-r install --local --yes
+   ```
+3. 安装器会创建一个 `.qwen/` 目录，包含所有必要文件
 
 ## 工作原理
 
@@ -146,6 +173,19 @@ qwen-superpowers/
 ## 创建自定义技能
 
 请参阅 `skills/writing-skills.md` 获取创建自定义技能的指南。
+
+## 发布到 npm（维护者）
+
+```bash
+# 准备并验证包
+./scripts/prepare-npm.sh
+
+# 登录 npm（仅首次）
+npm login
+
+# 发布
+npm publish
+```
 
 ## 许可证
 

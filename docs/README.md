@@ -4,6 +4,18 @@
 
 ### Installation
 
+#### Via npm (Recommended)
+
+```bash
+# Install globally
+npm install -g qwen-superpowers-r
+
+# Run interactive installer
+qwen-superpowers-r
+```
+
+#### Via Git
+
 1. Clone the repository:
 ```bash
 git clone https://github.com/your-org/qwen-superpowers.git
@@ -37,12 +49,18 @@ Qwen Code will automatically:
 
 ```bash
 # List available skills
+qwen-superpowers-r list
+# OR
 ./scripts/list-skills.sh
 
 # Create a new custom skill
+qwen-superpowers-r create-skill my-new-skill
+# OR
 ./scripts/create-skill.sh my-new-skill
 
 # Install to a project
+qwen-superpowers-r install
+# OR
 ./scripts/setup.sh /path/to/project
 ```
 

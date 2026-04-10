@@ -24,26 +24,53 @@ Qwen Superpowers transforme Qwen Code d'un assistant de codage polyvalent en un 
 
 ## Installation
 
-### Installation Rapide
+### Installation via npx (Recommandé)
+
+Aucune installation requise ! Utilisez `npx` pour exécuter les commandes directement :
+
+```bash
+# Exécuter l'installateur interactif
+npx qwen-superpowers-r install
+
+# Installer dans le projet actuel sans invites
+npx qwen-superpowers-r install --local --yes
+
+# Installer globalement sans invites
+npx qwen-superpowers-r install --global --yes
+
+# Lister les compétences disponibles
+npx qwen-superpowers-r list
+
+# Créer une nouvelle compétence
+npx qwen-superpowers-r create-skill my-custom-skill
+
+# Afficher l'aide
+npx qwen-superpowers-r help
+```
+
+L'installateur interactif vous demandera de choisir :
+- **Current Project (Projet Actuel)** - Installer dans le répertoire `./.qwen/`
+- **Global** - Installer dans `~/.qwen/` (partager entre les projets)
+
+### Installation via Git
 
 ```bash
 # Cloner ce dépôt
 git clone https://github.com/your-org/qwen-superpowers.git
 cd qwen-superpowers
 
-# Exécuter le script d'installation
-./scripts/setup.sh
+# Exécuter en utilisant npx
+npx qwen-superpowers-r install --local
 ```
 
 ### Installation Manuelle
 
 1. Copier le fichier `.qwen-plugin` à la racine de votre projet
-2. Copier les répertoires `skills/`, `hooks/`, `commands/`, et `agents/` dans votre projet
-3. Ajouter ce qui suit à vos paramètres Qwen Code ou `QWEN.md` :
-
-```markdown
-@load ./skills/using-superpowers.md
-```
+2. Exécuter l'installateur pour copier les compétences dans votre projet :
+   ```bash
+   npx qwen-superpowers-r install --local --yes
+   ```
+3. L'installateur créera un répertoire `.qwen/` avec tous les fichiers nécessaires
 
 ## Comment ça Fonctionne
 

@@ -1,0 +1,65 @@
+{
+  "name": "qwen-superpowers-r",
+  "version": "1.1.0",
+  "description": "Comprehensive skill system for Qwen Code - TDD, systematic debugging, planning, and more",
+  "main": "index.js",
+  "bin": {
+    "qwen-superpowers": "./bin/qwen-superpowers.js"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "hooks/",
+    "commands/",
+    "agents/",
+    "scripts/",
+    "docs/",
+    "QWEN.md",
+    ".qwen-plugin",
+    "README.md",
+    "README.zh.md",
+    "README.ja.md",
+    "README.ko.md",
+    "README.es.md",
+    "README.fr.md",
+    "README.de.md",
+    "CHANGELOG.md",
+    "QUICK_REFERENCE.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "prepublishOnly": "chmod +x bin/qwen-superpowers.js scripts/setup.sh scripts/create-skill.sh scripts/list-skills.sh",
+    "postinstall": "node -e \"try{require('./bin/qwen-superpowers.js').postInstall()}catch(e){}\"",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "qwen",
+    "qwen-code",
+    "superpowers",
+    "tdd",
+    "development",
+    "workflow",
+    "debugging",
+    "planning",
+    "code-review",
+    "git",
+    "skills",
+    "ai-assistant"
+  ],
+  "author": "Qwen Superpowers Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/qwen-superpowers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/qwen-superpowers/issues"
+  },
+  "homepage": "https://github.com/your-org/qwen-superpowers#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "directories": {
+    "doc": "docs"
+  }
+}

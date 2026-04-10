@@ -24,26 +24,53 @@ Qwen Superpowers 는 Qwen Code 를 범용 코딩 어시스턴트에서 검증된
 
 ## 설치
 
-### 빠른 설치
+### npx 설치 (권장)
+
+설치 불필요! `npx` 를 사용하여 직접 명령을 실행하세요:
+
+```bash
+# 대화형 설치 프로그램 실행
+npx qwen-superpowers-r install
+
+# 프롬프트 없이 현재 프로젝트에 설치
+npx qwen-superpowers-r install --local --yes
+
+# 프롬프트 없이 글로벌로 설치
+npx qwen-superpowers-r install --global --yes
+
+# 사용 가능한 스킬 나열
+npx qwen-superpowers-r list
+
+# 새 스킬 생성
+npx qwen-superpowers-r create-skill my-custom-skill
+
+# 도움말 표시
+npx qwen-superpowers-r help
+```
+
+대화형 설치 프로그램이 다음 옵션을 표시합니다:
+- **Current Project (현재 프로젝트)** - `./.qwen/` 디렉토리에 설치
+- **Global (글로벌)** - `~/.qwen/` 에 설치 (프로젝트 간 공유)
+
+### Git 설치
 
 ```bash
 # 이 저장소를 클론
 git clone https://github.com/your-org/qwen-superpowers.git
 cd qwen-superpowers
 
-# 설치 스크립트 실행
-./scripts/setup.sh
+# npx 를 사용하여 실행
+npx qwen-superpowers-r install --local
 ```
 
 ### 수동 설치
 
 1. `.qwen-plugin` 파일을 프로젝트 루트에 복사
-2. `skills/`, `hooks/`, `commands/`, `agents/` 디렉토리를 프로젝트에 복사
-3. 다음 내용을 Qwen Code 설정 또는 `QWEN.md` 에 추가:
-
-```markdown
-@load ./skills/using-superpowers.md
-```
+2. 설치 프로그램을 실행하여 스킬을 프로젝트에 복사:
+   ```bash
+   npx qwen-superpowers-r install --local --yes
+   ```
+3. 설치 프로그램이 필요한 파일을 포함한 `.qwen/` 디렉토리를 생성합니다
 
 ## 작동 방식
 

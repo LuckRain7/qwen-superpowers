@@ -24,26 +24,53 @@ Qwen Superpowers transforms Qwen Code from a general-purpose coding assistant in
 
 ## Installation
 
-### Quick Install
+### npx Installation (Recommended)
+
+No installation required! Use `npx` to run commands directly:
+
+```bash
+# Run interactive installer
+npx qwen-superpowers-r install
+
+# Install to current project without prompts
+npx qwen-superpowers-r install --local --yes
+
+# Install globally without prompts
+npx qwen-superpowers-r install --global --yes
+
+# List available skills
+npx qwen-superpowers-r list
+
+# Create a new skill
+npx qwen-superpowers-r create-skill my-custom-skill
+
+# Show help
+npx qwen-superpowers-r help
+```
+
+The interactive installer will prompt you to choose:
+- **Current Project** - Install to `./.qwen/` directory
+- **Global** - Install to `~/.qwen/` (share across projects)
+
+### Git Installation
 
 ```bash
 # Clone this repository
 git clone https://github.com/your-org/qwen-superpowers.git
 cd qwen-superpowers
 
-# Run the setup script
-./scripts/setup.sh
+# Run using npx
+npx qwen-superpowers-r install --local
 ```
 
 ### Manual Installation
 
 1. Copy the `.qwen-plugin` file to your project root
-2. Copy the `skills/`, `hooks/`, `commands/`, and `agents/` directories to your project
-3. Add the following to your Qwen Code settings or `QWEN.md`:
-
-```markdown
-@load ./skills/using-superpowers.md
-```
+2. Run the installer to copy skills to your project:
+   ```bash
+   npx qwen-superpowers-r install --local --yes
+   ```
+3. The installer will create a `.qwen/` directory with all necessary files
 
 ## How It Works
 
@@ -146,6 +173,19 @@ qwen-superpowers/
 ## Creating Custom Skills
 
 See `skills/writing-skills.md` for a guide on creating your own skills.
+
+## Publishing to npm (For Maintainers)
+
+```bash
+# Prepare and validate the package
+./scripts/prepare-npm.sh
+
+# Login to npm (first time only)
+npm login
+
+# Publish
+npm publish
+```
 
 ## License
 

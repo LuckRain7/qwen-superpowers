@@ -24,26 +24,53 @@ Qwen Superpowers は、Qwen Code を汎用のコーディングアシスタン�
 
 ## インストール
 
-### クイックインストール
+### npx インストール（推奨）
+
+インストール不要！`npx` を使って直接コマンドを実行できます：
+
+```bash
+# インタラクティブインストーラーを実行
+npx qwen-superpowers-r install
+
+# プロンプトなしで現在のプロジェクトにインストール
+npx qwen-superpowers-r install --local --yes
+
+# プロンプトなしでグローバルにインストール
+npx qwen-superpowers-r install --global --yes
+
+# 利用可能なスキルを一覧表示
+npx qwen-superpowers-r list
+
+# 新しいスキルを作成
+npx qwen-superpowers-r create-skill my-custom-skill
+
+# ヘルプを表示
+npx qwen-superpowers-r help
+```
+
+インタラクティブインストーラーは以下の選択肢を表示します：
+- **Current Project（現在のプロジェクト）** - `./.qwen/` ディレクトリにインストール
+- **Global（グローバル）** - `~/.qwen/` にインストール（プロジェクト間で共有）
+
+### Git インストール
 
 ```bash
 # このリポジトリをクローン
 git clone https://github.com/your-org/qwen-superpowers.git
 cd qwen-superpowers
 
-# セットアップスクリプトを実行
-./scripts/setup.sh
+# npx を使用して実行
+npx qwen-superpowers-r install --local
 ```
 
 ### マニュアルインストール
 
 1. `.qwen-plugin` ファイルをプロジェクトルートにコピー
-2. `skills/`、`hooks/`、`commands/`、`agents/` ディレクトリをプロジェクトにコピー
-3. 以下を Qwen Code の設定または `QWEN.md` に追加：
-
-```markdown
-@load ./skills/using-superpowers.md
-```
+2. インストーラーを実行してスキルをプロジェクトにコピー：
+   ```bash
+   npx qwen-superpowers-r install --local --yes
+   ```
+3. インストーラーが必要なファイルを含む `.qwen/` ディレクトリを作成します
 
 ## 仕組み
 
