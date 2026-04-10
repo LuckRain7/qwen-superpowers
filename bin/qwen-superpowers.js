@@ -174,7 +174,7 @@ function copyDirectory(src, dest) {
   }
 }
 
-function installToLocal(targetDir, skipPrompt = false) {
+async function installToLocal(targetDir, skipPrompt = false) {
   const packageRoot = path.join(__dirname, '..');
   const qwenDir = path.join(targetDir, '.qwen');
 
@@ -222,13 +222,15 @@ function installToLocal(targetDir, skipPrompt = false) {
   }
 
   // Copy skills, hooks, commands, agents directories to .qwen
-  ['skills', 'hooks', 'commands', 'agents'].forEach(dir => {
+  const dirsToCopy = ['skills', 'hooks', 'commands', 'agents'];
+  
+  for (const dir of dirsToCopy) {
     const srcDir = path.join(packageRoot, dir);
     const destDir = path.join(qwenDir, dir);
 
     if (!fs.existsSync(srcDir)) {
       console.log(colorize('✓', 'yellow') + ` Skipped ${dir}/ (not found in package)`);
-      return;
+      continue;
     }
 
     if (fs.existsSync(destDir)) {
@@ -240,7 +242,7 @@ function installToLocal(targetDir, skipPrompt = false) {
           output: process.stdout
         });
 
-        return new Promise((resolve) => {
+        await new Promise((resolve) => {
           rl.question(colorize(`Overwrite ${dir}/ directory? (y/N) `, 'yellow'), (answer) => {
             rl.close();
             if (answer.toLowerCase().startsWith('y')) {
@@ -260,7 +262,7 @@ function installToLocal(targetDir, skipPrompt = false) {
       copyDirectory(srcDir, destDir);
       console.log(colorize('✓', 'green') + ` Copied ${dir}/`);
     }
-  });
+  }
 
   // Copy .qwen-plugin to project root (not .qwen)
   const pluginDest = path.join(targetDir, '.qwen-plugin');
@@ -290,7 +292,7 @@ function installToLocal(targetDir, skipPrompt = false) {
   return Promise.resolve();
 }
 
-function installToGlobal(skipPrompt = false) {
+async function installToGlobal(skipPrompt = false) {
   const packageRoot = path.join(__dirname, '..');
   
   // 确定全局 .qwen 目录
@@ -342,15 +344,17 @@ function installToGlobal(skipPrompt = false) {
   }
 
   // 复制 skills, hooks, commands, agents 目录到 .qwen
-  ['skills', 'hooks', 'commands', 'agents'].forEach(dir => {
+  const dirsToCopy = ['skills', 'hooks', 'commands', 'agents'];
+  
+  for (const dir of dirsToCopy) {
     const srcDir = path.join(packageRoot, dir);
     const destDir = path.join(qwenDir, dir);
-    
+
     if (!fs.existsSync(srcDir)) {
       console.log(colorize('✓', 'yellow') + ` Skipped ${dir}/ (not found in package)`);
-      return;
+      continue;
     }
-    
+
     if (fs.existsSync(destDir)) {
       console.log(colorize('Warning:', 'yellow') + ` ${dir}/ directory already exists in .qwen/`);
       if (!skipPrompt) {
@@ -360,7 +364,7 @@ function installToGlobal(skipPrompt = false) {
           output: process.stdout
         });
 
-        return new Promise((resolve) => {
+        await new Promise((resolve) => {
           rl.question(colorize(`Overwrite ${dir}/ directory? (y/N) `, 'yellow'), (answer) => {
             rl.close();
             if (answer.toLowerCase().startsWith('y')) {
@@ -380,7 +384,7 @@ function installToGlobal(skipPrompt = false) {
       copyDirectory(srcDir, destDir);
       console.log(colorize('✓', 'green') + ` Copied ${dir}/`);
     }
-  });
+  }
 
   // 复制 .qwen-plugin 到 .qwen 目录
   const pluginDest = path.join(qwenDir, '.qwen-plugin');
