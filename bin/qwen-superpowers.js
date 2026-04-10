@@ -7,6 +7,11 @@ const path = require('path');
 const { execSync } = require('child_process');
 const os = require('os');
 
+const { version: VERSION } = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')
+);
+const PACKAGE_NAME = 'Qwen Superpowers';
+
 // Colors for terminal output
 const COLORS = {
   reset: '\x1b[0m',
@@ -33,11 +38,13 @@ function printHeader() {
 }
 
 function printHelp() {
+  console.log(colorize(`Version: ${VERSION}`, 'dim'));
+  console.log();
   console.log(colorize('Usage:', 'bold'));
-  console.log(`  ${colorize('qwen-superpowers', 'cyan')}                     # Interactive installation`);
-  console.log(`  ${colorize('qwen-superpowers install', 'cyan')}             # Interactive installation`);
-  console.log(`  ${colorize('qwen-superpowers install --global', 'cyan')}    # Install globally`);
-  console.log(`  ${colorize('qwen-superpowers install --local [dir]', 'cyan')} # Install to project`);
+  console.log(`  ${colorize(PACKAGE_NAME, 'cyan')}                     # Interactive installation`);
+  console.log(`  ${colorize(`${PACKAGE_NAME} install`, 'cyan')}             # Interactive installation`);
+  console.log(`  ${colorize(`${PACKAGE_NAME} install --global`, 'cyan')}    # Install globally`);
+  console.log(`  ${colorize(`${PACKAGE_NAME} install --local [dir]`, 'cyan')} # Install to project`);
   console.log();
   console.log(colorize('Commands:', 'bold'));
   console.log(`  ${colorize('install', 'cyan')}        Install superpowers (default command)`);
@@ -85,7 +92,7 @@ function listSkills() {
 function createSkill(skillName) {
   if (!skillName) {
     console.error(colorize('Error: skill name is required', 'red'));
-    console.log(`Usage: ${colorize('qwen-superpowers create-skill <name>', 'cyan')}\n`);
+    console.log(`Usage: ${colorize(`${PACKAGE_NAME} create-skill <name>`, 'cyan')}\n`);
     process.exit(1);
   }
 
@@ -458,7 +465,7 @@ function postInstall() {
   // Only run interactive prompt if this is a global install
   if (process.env.npm_config_global || process.env.npm_config_prefix) {
     console.log(colorize('\n🎉 Thank you for installing Qwen Superpowers!', 'green'));
-    console.log(colorize('Run', 'dim') + colorize(' qwen-superpowers', 'cyan') + colorize(' to set up in your project\n', 'dim'));
+    console.log(colorize('Run', 'dim') + colorize(` ${PACKAGE_NAME}`, 'cyan') + colorize(' to set up in your project\n', 'dim'));
   }
 }
 
@@ -466,10 +473,15 @@ function postInstall() {
 async function main() {
   const args = process.argv.slice(2);
 
-  // Handle --help or -h anywhere
+  // Handle --help, -h, --version, -v anywhere
   if (args.includes('--help') || args.includes('-h')) {
     printHeader();
     printHelp();
+    process.exit(0);
+  }
+
+  if (args.includes('--version') || args.includes('-v')) {
+    console.log(colorize(`${PACKAGE_NAME} v${VERSION}`, 'cyan'));
     process.exit(0);
   }
 
@@ -519,15 +531,22 @@ async function main() {
       printHelp();
       break;
 
+    case 'version':
+    case 'v':
+      console.log(colorize(`${PACKAGE_NAME} v${VERSION}`, 'cyan'));
+      process.exit(0);
+      break;
+
     default:
       console.error(colorize(`Unknown command: ${command}`, 'red'));
-      console.log(`Run ${colorize('qwen-superpowers help', 'cyan')} for usage information\n`);
+      console.log(`Run ${colorize(`${PACKAGE_NAME} help`, 'cyan')} for usage information\n`);
       process.exit(1);
   }
 }
 
 // Export for use by other modules
 module.exports = {
+  VERSION,
   postInstall,
   installToLocal,
   installToGlobal,

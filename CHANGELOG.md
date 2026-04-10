@@ -5,6 +5,16 @@ All notable changes to Qwen Superpowers will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-04-10
+
+### Fixed
+
+#### CLI Improvements
+- Added version display in help output (`--version`, `-v`, `version` command)
+- Replaced hardcoded command name with dynamic `PACKAGE_NAME` constant
+- Added `VERSION` export for programmatic access
+- Improved consistency in usage examples and error messages
+
 ## [1.1.0] - 2026-04-10
 
 ### Added
